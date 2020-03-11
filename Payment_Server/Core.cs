@@ -9,7 +9,7 @@ namespace Payment_Server
 {
     class Core
     {
-        Hashtable ext_client_set = Hashtable.Synchronized(new Hashtable());
+        public Hashtable ext_client_set = Hashtable.Synchronized(new Hashtable());
         DS_Server ds_server = new DS_Server();
         External_Server ext_server = new External_Server();
         public void Run()
@@ -18,7 +18,7 @@ namespace Payment_Server
             {
                 while (true)
                 {
-                    var client = ext_server.Get_Client();
+                    var client = ext_server.Get_Client((string id) => { ext_client_set.Remove(id); });
                     if (ext_client_set.ContainsKey(client.Item1)) ext_client_set.Remove(client.Item1);
                     ext_client_set.Add(client.Item1, client.Item2);
                 }

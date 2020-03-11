@@ -12,17 +12,18 @@ namespace Payment_Server
 {
     class External_Client
     {
-        public JObject Config;
+        public JObject Config; public string ID;
 
         NetworkStream client;
         Hashtable Response = Hashtable.Synchronized(new Hashtable());
         Queue Request = Queue.Synchronized(new Queue());
         int work_id = 0;
         object lock_obj = new object();
+        Action<string> dispose;
 
-        public External_Client(TcpClient client)
+        public External_Client(TcpClient client ,Action<string> dispose)
         {
-            this.client = client.GetStream();
+            this.client = client.GetStream(); this.dispose = dispose;
             Run_Response();
             Task.Run(() => { while (true) Run_Request(); });
             Task.Run(() => { while (true) Run_Response(); });
@@ -30,29 +31,37 @@ namespace Payment_Server
 
         void Run_Request()
         {
-            if (Request.Count > 0)
+            try
             {
-                byte[] buffer = new byte[Int32.Parse(Properties.Resources.payload_len)];
-                byte[] temp = Encoding.UTF8.GetBytes(Request.Dequeue() as string);
-                for (int i = 0; i < temp.Length; i++) buffer[i] = temp[i];
-                client.Write(buffer, 0, buffer.Length);
+                if (Request.Count > 0)
+                {
+                    byte[] buffer = new byte[Int32.Parse(Properties.Resources.payload_len)];
+                    byte[] temp = Encoding.UTF8.GetBytes(Request.Dequeue() as string);
+                    for (int i = 0; i < temp.Length; i++) buffer[i] = temp[i];
+                    client.Write(buffer, 0, buffer.Length);
+                }
             }
+            catch (Exception e) { dispose(ID); }
         }
 
         void Run_Response()
         {
-            byte[] temp = new byte[Int32.Parse(Properties.Resources.external_response_len)];
-            client.Read(temp, 0, temp.Length);
-            JObject response = (JObject)JsonConvert.DeserializeObject(Encoding.ASCII.GetString(temp));
-            JObject payload = (JObject)response["payload"];
-            if (response["type"].ToObject<string>() == "config") Config = payload;
-            else
+            try
             {
-                string id = response["work_id"].ToObject<string>();
-                if (!Response.ContainsKey(id)) throw new Exception("Received invalid work id '" + id + "' from external client.");
-                (Response[id] as Action<string>)(JsonConvert.SerializeObject(payload));
-                Response.Remove(id);
+                byte[] temp = new byte[Int32.Parse(Properties.Resources.external_response_len)];
+                client.Read(temp, 0, temp.Length);
+                JObject response = (JObject)JsonConvert.DeserializeObject(Encoding.ASCII.GetString(temp));
+                JObject payload = (JObject)response["payload"];
+                if (response["type"].ToObject<string>() == "config") { Config = payload; ID = Config["org_id"].ToObject<string>(); }
+                else
+                {
+                    string id = response["work_id"].ToObject<string>();
+                    if (!Response.ContainsKey(id)) throw new Exception("Received invalid work id '" + id + "' from external client.");
+                    (Response[id] as Action<string>)(JsonConvert.SerializeObject(payload));
+                    Response.Remove(id);
+                }
             }
+            catch (Exception e) { dispose(ID); }
         }
 
         public void Run(JObject payload, Action<string> callback)
