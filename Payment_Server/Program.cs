@@ -17,16 +17,17 @@ namespace Payment_Server
             var top = Application.Top;
             var win = new Window("Payment Server") { X = 1, Y = 1, Width = Dim.Fill(2), Height = Dim.Fill(1) };
             top.Add(win);
-            var list = new ListView() { X = 3, Y = 2 , Width = Dim.Fill(2), Height = Dim.Fill(1) };
-            win.Add(list);
+            var list = new ListView() { X = 3, Y = 2 , Width = 30, Height = Dim.Fill(1) };
+            var err = new ListView() { X = 50, Y = 2, Width = 30, Height = Dim.Fill(1) };
+            win.Add(list); win.Add(err);
 
             Task.Run(() => { Application.Run(); });
             while (true)
             {
                 Thread.Sleep(1000);
                 ArrayList clients = new ArrayList();
-                lock (core.ext_client_set) foreach (DictionaryEntry pair in core.ext_client_set) clients.Add("[ONLINE] External Client: " + pair.Key);
-                list.SetSource(clients);
+                lock (core.ext_client_set) foreach (var pair in core.ext_client_set) clients.Add("[ONLINE] External Client: " + pair.Key);
+                list.SetSource(clients); err.SetSource(core.errors);
                 Application.Refresh();
             }
         }

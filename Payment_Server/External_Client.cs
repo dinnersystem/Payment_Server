@@ -17,16 +17,22 @@ namespace Payment_Server
         NetworkStream client;
         Hashtable Response = Hashtable.Synchronized(new Hashtable());
         Queue Request = Queue.Synchronized(new Queue());
-        int work_id = 0;
-        object lock_obj = new object();
-        Action<string> dispose;
+        int work_id = 0; object lock_obj = new object();
+        Action<string> dispose; bool should_dispose = false;
 
-        public External_Client(TcpClient client ,Action<string> dispose)
+        public External_Client(TcpClient client, Action<string> dispose)
         {
             this.client = client.GetStream(); this.dispose = dispose;
             Run_Response();
-            Task.Run(() => { while (true) Run_Request(); });
-            Task.Run(() => { while (true) Run_Response(); });
+            Task.Run(() =>
+            {
+                Task.WaitAll(new List<Task>() { Task.Run(() =>
+                {
+                    while (!should_dispose) Run_Request(); }),
+                    Task.Run(() => { while (!should_dispose) Run_Response(); })
+                }.ToArray());
+                dispose(ID);
+            });
         }
 
         void Run_Request()
@@ -41,7 +47,7 @@ namespace Payment_Server
                     client.Write(buffer, 0, buffer.Length);
                 }
             }
-            catch (Exception e) { dispose(ID); }
+            catch (Exception e) { should_dispose = true; }
         }
 
         void Run_Response()
@@ -61,7 +67,7 @@ namespace Payment_Server
                     Response.Remove(id);
                 }
             }
-            catch (Exception e) { dispose(ID); }
+            catch (Exception e) { should_dispose = true; }
         }
 
         public void Run(JObject payload, Action<string> callback)
