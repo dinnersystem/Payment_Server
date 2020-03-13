@@ -44,6 +44,7 @@ namespace Payment_Server
                     byte[] buffer = new byte[Int32.Parse(Properties.Resources.payload_len)];
                     byte[] temp = Encoding.UTF8.GetBytes(Request.Dequeue() as string);
                     for (int i = 0; i < temp.Length; i++) buffer[i] = temp[i];
+                    Console.WriteLine(Encoding.UTF8.GetString(temp).Substring(0, 1000));
                     client.Write(buffer, 0, buffer.Length);
                 }
             }
@@ -56,7 +57,7 @@ namespace Payment_Server
             {
                 byte[] temp = new byte[Int32.Parse(Properties.Resources.external_response_len)];
                 client.Read(temp, 0, temp.Length);
-                JObject response = (JObject)JsonConvert.DeserializeObject(Encoding.ASCII.GetString(temp));
+                JObject response = (JObject)JsonConvert.DeserializeObject(Encoding.UTF8.GetString(temp));
                 JObject payload = (JObject)response["payload"];
                 if (response["type"].ToObject<string>() == "config") { Config = payload; ID = Config["org_id"].ToObject<string>(); }
                 else

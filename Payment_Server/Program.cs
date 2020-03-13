@@ -21,14 +21,14 @@ namespace Payment_Server
             var err = new ListView() { X = 50, Y = 2, Width = 30, Height = Dim.Fill(1) };
             win.Add(list); win.Add(err);
 
-            Task.Run(() => { Application.Run(); });
+            //Task.Run(() => { Application.Run(); });
             while (true)
             {
                 Thread.Sleep(1000);
                 ArrayList clients = new ArrayList();
                 lock (core.ext_client_set) foreach (var pair in core.ext_client_set) clients.Add("[ONLINE] External Client: " + pair.Key);
                 list.SetSource(clients); err.SetSource(core.errors);
-                Application.Refresh();
+                //Application.Refresh();
             }
         }
     }

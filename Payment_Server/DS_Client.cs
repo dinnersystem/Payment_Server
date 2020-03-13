@@ -22,10 +22,11 @@ namespace Payment_Server
                 this.client.Read(temp, 0, temp.Length);
                 payload.Append(Encoding.UTF8.GetString(temp));
             } while (this.client.DataAvailable);
+            Console.WriteLine(payload.ToString().Substring(0, 1000));
             this.Payload = (JObject)JsonConvert.DeserializeObject(payload.ToString());
         }
 
-        public void Response(string s) { client.Write(new ReadOnlySpan<byte>(Encoding.ASCII.GetBytes(s))); client.Close(); }
+        public void Response(string s) { client.Write(new ReadOnlySpan<byte>(Encoding.UTF8.GetBytes(s))); client.Close(); }
 
         public string Get_External_Id() { return Payload["org_id"].ToObject<string>(); }
     }
