@@ -23,7 +23,6 @@ namespace Payment_Server
                     var client = ext_server.Get_Client((string id) => { ext_client_set.TryRemove(id, out External_Client ext_client); });
                     if (ext_client_set.ContainsKey(client.Item1)) ext_client_set.TryRemove(client.Item1, out External_Client ext_client);
                     ext_client_set.TryAdd(client.Item1, client.Item2);
-                    Console.WriteLine("ADD " + client.Item1);
                 }
             });
 
@@ -33,9 +32,12 @@ namespace Payment_Server
                 {
                     DS_Client ds_client = ds_server.Get_Client();
                     string id = ds_client.Get_External_Id();
-                    if (!ext_client_set.ContainsKey(id)) throw new Exception("Unavailable external id on" + id);
-                    External_Client ext_client = (External_Client)ext_client_set[id];
-                    ext_client.Run(ds_client.Payload ,(string status) => { ds_client.Response(status); });
+                    if (!ext_client_set.ContainsKey(id)) errors.Add("[ERROR] Unavailable external id on " + id + ".");
+                    else
+                    {
+                        External_Client ext_client = (External_Client)ext_client_set[id];
+                        ext_client.Run(ds_client.Payload, (string status) => { ds_client.Response(status); });
+                    }
                 }
             });
         }

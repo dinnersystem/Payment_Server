@@ -22,7 +22,6 @@ namespace Payment_Server
                 this.client.Read(temp, 0, temp.Length);
                 payload.Append(Encoding.UTF8.GetString(temp));
             } while (this.client.DataAvailable);
-            Console.WriteLine(payload.ToString().Substring(0, 1000));
             this.Payload = (JObject)JsonConvert.DeserializeObject(payload.ToString());
         }
 
