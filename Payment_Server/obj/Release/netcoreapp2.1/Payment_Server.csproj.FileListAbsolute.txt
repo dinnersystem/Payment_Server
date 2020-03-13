@@ -1,0 +1,13 @@
+D:\github\Payment_Server\Payment_Server\bin\Release\netcoreapp2.1\Payment_Server.deps.json
+D:\github\Payment_Server\Payment_Server\bin\Release\netcoreapp2.1\Payment_Server.runtimeconfig.json
+D:\github\Payment_Server\Payment_Server\bin\Release\netcoreapp2.1\Payment_Server.runtimeconfig.dev.json
+D:\github\Payment_Server\Payment_Server\bin\Release\netcoreapp2.1\Payment_Server.dll
+D:\github\Payment_Server\Payment_Server\bin\Release\netcoreapp2.1\Payment_Server.pdb
+D:\github\Payment_Server\Payment_Server\obj\Release\netcoreapp2.1\Payment_Server.csprojAssemblyReference.cache
+D:\github\Payment_Server\Payment_Server\obj\Release\netcoreapp2.1\Payment_Server.Properties.Resources.resources
+D:\github\Payment_Server\Payment_Server\obj\Release\netcoreapp2.1\Payment_Server.csproj.GenerateResource.cache
+D:\github\Payment_Server\Payment_Server\obj\Release\netcoreapp2.1\Payment_Server.csproj.CoreCompileInputs.cache
+D:\github\Payment_Server\Payment_Server\obj\Release\netcoreapp2.1\Payment_Server.AssemblyInfoInputs.cache
+D:\github\Payment_Server\Payment_Server\obj\Release\netcoreapp2.1\Payment_Server.AssemblyInfo.cs
+D:\github\Payment_Server\Payment_Server\obj\Release\netcoreapp2.1\Payment_Server.dll
+D:\github\Payment_Server\Payment_Server\obj\Release\netcoreapp2.1\Payment_Server.pdb
