@@ -20,15 +20,10 @@ namespace Payment_Server
             {
                 while (true)
                 {
-                    var client = ext_server.Get_Client((string id) => 
-                    {
-                        ext_client_set.TryRemove(id, out External_Client ext_client);
-                    });
-                    lock (ext_client_set)
-                    {
-                        if (ext_client_set.ContainsKey(client.Item1)) ext_client_set.TryRemove(client.Item1, out External_Client ext_client);
-                        ext_client_set.TryAdd(client.Item1, client.Item2);
-                    }
+                    var client = ext_server.Get_Client((string id) => { ext_client_set.TryRemove(id, out External_Client ext_client); });
+                    if (ext_client_set.ContainsKey(client.Item1)) ext_client_set.TryRemove(client.Item1, out External_Client ext_client);
+                    ext_client_set.TryAdd(client.Item1, client.Item2);
+                    Console.WriteLine("ADD " + client.Item1);
                 }
             });
 
