@@ -122,7 +122,7 @@
     <comment>The port for connection between dinnersystem and payment server. Do not occupy this  port.</comment>
   </data>
   <data name="external_port" xml:space="preserve">
-    <value>13</value>
+    <value>1101</value>
     <comment>The port for connection between payment server and external clients. Do not occupy this port.</comment>
   </data>
   <data name="external_response_len" xml:space="preserve">
