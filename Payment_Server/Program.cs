@@ -17,18 +17,24 @@ namespace Payment_Server
             var top = Application.Top;
             var win = new Window("Payment Server") { X = 1, Y = 1, Width = Dim.Fill(2), Height = Dim.Fill(1) };
             top.Add(win);
-            var list = new ListView() { X = 3, Y = 2 , Width = 50, Height = Dim.Fill(1) };
-            var err = new ListView() { X = 50, Y = 2, Width = 50, Height = Dim.Fill(1) };
-            win.Add(list); win.Add(err);
+            var list = new ListView() { X = 3, Y = 4 , Width = 50, Height = Dim.Fill(1) };
+            var err = new ListView() { X = 50, Y = 4, Width = 50, Height = Dim.Fill(1) };
+            var clock = new ListView() { X = 25, Y = 1, Width = 50, Height = 1 };
+            win.Add(list); win.Add(err); win.Add(clock);
 
             Task.Run(() =>
             {
-                Thread.Sleep(1000);
-                ArrayList clients = new ArrayList();
-                lock (core.ext_client_set) foreach (var pair in core.ext_client_set) clients.Add("[ONLINE] External Client: " + pair.Key);
-                list.SetSource(clients); err.SetSource(core.errors);
-                Application.Refresh();
-            }
+                while(true)
+                {
+                    Thread.Sleep(1000);
+                    ArrayList clients = new ArrayList();
+                    lock (core.ext_client_set) foreach (var pair in core.ext_client_set) clients.Add("[ONLINE] External Client: " + pair.Key);
+                    list.SetSource(clients); err.SetSource(core.errors);
+                    clock.SetSource(new ArrayList() { DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss") });
+                    Application.Refresh();
+                }
+            });
+            Application.Run();
         }
     }
 }

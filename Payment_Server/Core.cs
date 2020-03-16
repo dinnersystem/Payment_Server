@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 using System.Globalization;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace Payment_Server
 {
@@ -17,6 +18,10 @@ namespace Payment_Server
 
         DS_Server ds_server = new DS_Server();
         External_Server ext_server = new External_Server();
+        StreamWriter logger = new StreamWriter("payment_log.txt", true);
+
+        public Core() { logger.AutoFlush = true; }
+
         public void Run()
         {
             Task.Run(() =>
@@ -35,6 +40,8 @@ namespace Payment_Server
                 {
                     DS_Client ds_client = ds_server.Get_Client();
                     string id = ds_client.Get_External_Id();
+                    logger.WriteLine("From DS," + DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss") + "," + JsonConvert.SerializeObject(ds_client.Payload));
+                    
                     if (!ext_client_set.ContainsKey(id))
                     {
                         errors.Add("[ERROR] Unavailable external id on " + id + ".");
@@ -44,7 +51,11 @@ namespace Payment_Server
                     else
                     {
                         External_Client ext_client = (External_Client)ext_client_set[id];
-                        ext_client.Run(ds_client.Payload, (string status) => { ds_client.Response(status); });
+                        ext_client.Run(ds_client.Payload, (string status) => 
+                        {
+                            logger.WriteLine("From EXT," + DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss") + "," + status);
+                            ds_client.Response(status);
+                        });
                     }
                 }
             });
