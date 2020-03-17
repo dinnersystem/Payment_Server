@@ -133,4 +133,8 @@
     <value>65536</value>
     <comment>The buffer size for order(payload).</comment>
   </data>
+  <data name="ping_interval" xml:space="preserve">
+    <value>600000</value>
+    <comment>The interval of ping on TCP(in miliseconds).</comment>
+  </data>
 </root>

@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using System.Threading;
 using Newtonsoft.Json;
 
 namespace Payment_Server
@@ -19,17 +20,26 @@ namespace Payment_Server
         Queue Request = Queue.Synchronized(new Queue());
         int work_id = 0; object lock_obj = new object();
         Action<string> dispose; bool should_dispose = false;
+        JObject ping = new JObject();
 
         public External_Client(TcpClient client, Action<string> dispose)
         {
-            client.NoDelay = true; this.client = client.GetStream(); this.dispose = dispose;
+            client.NoDelay = true; this.client = client.GetStream(); this.dispose = dispose; ping["operation"] = "ping";
             Run_Response();
             Task.Run(() =>
             {
                 Task.WaitAll(new List<Task>()
                 {
                     Task.Run(() => { while (!should_dispose) Run_Request(); }),
-                    Task.Run(() => { while (!should_dispose) Run_Response(); })
+                    Task.Run(() => { while (!should_dispose) Run_Response(); }),
+                    Task.Run(() => 
+                    {
+                        while(!should_dispose)
+                        {
+                            Run(ping ,(string s) => { });
+                            Thread.Sleep(Int32.Parse(Properties.Resources.ping_interval));
+                        }
+                    }),
                 }.ToArray());
                 dispose(ID);
             });
@@ -44,7 +54,6 @@ namespace Payment_Server
                     byte[] buffer = new byte[Int32.Parse(Properties.Resources.payload_len)];
                     byte[] temp = Encoding.UTF8.GetBytes(Request.Dequeue() as string);
                     for (int i = 0; i < temp.Length; i++) buffer[i] = temp[i];
-
                     client.Write(buffer, 0, buffer.Length);
                 }
             }

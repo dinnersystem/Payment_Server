@@ -70,7 +70,7 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 13.
+        ///   Looks up a localized string similar to 1101.
         /// </summary>
         internal static string external_port {
             get {
@@ -93,6 +93,15 @@ namespace Payment_Server.Properties {
         internal static string payload_len {
             get {
                 return ResourceManager.GetString("payload_len", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 600000.
+        /// </summary>
+        internal static string ping_interval {
+            get {
+                return ResourceManager.GetString("ping_interval", resourceCulture);
             }
         }
     }
