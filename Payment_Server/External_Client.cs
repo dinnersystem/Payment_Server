@@ -43,7 +43,7 @@ namespace Payment_Server
         {
             try
             {
-                if (Request.Count > 0)
+                while (Request.Count > 0)
                 {
                     byte[] buffer = new byte[Int32.Parse(Properties.Resources.payload_len)];
                     byte[] temp = Encoding.UTF8.GetBytes(Request.Dequeue() as string);
@@ -58,18 +58,21 @@ namespace Payment_Server
         {
             try
             {
-                byte[] temp = new byte[Int32.Parse(Properties.Resources.external_response_len)];
-                client.Read(temp, 0, temp.Length);
-                JObject response = (JObject)JsonConvert.DeserializeObject(Encoding.UTF8.GetString(temp));
-                JObject payload = (JObject)response["payload"];
-                if (response["type"].ToObject<string>() == "config") { Config = payload; ID = Config["org_id"].ToObject<string>(); }
-                else
+                do
                 {
-                    string id = response["work_id"].ToObject<string>();
-                    if (!Response.ContainsKey(id)) throw new Exception("Received invalid work id '" + id + "' from external client.");
-                    (Response[id] as Action<string>)(JsonConvert.SerializeObject(payload));
-                    Response.Remove(id);
-                }
+                    byte[] temp = new byte[Int32.Parse(Properties.Resources.external_response_len)];
+                    client.Read(temp, 0, temp.Length);
+                    JObject response = (JObject)JsonConvert.DeserializeObject(Encoding.UTF8.GetString(temp));
+                    JObject payload = (JObject)response["payload"];
+                    if (response["type"].ToObject<string>() == "config") { Config = payload; ID = Config["org_id"].ToObject<string>(); }
+                    else
+                    {
+                        string id = response["work_id"].ToObject<string>();
+                        if (!Response.ContainsKey(id)) throw new Exception("Received invalid work id '" + id + "' from external client.");
+                        (Response[id] as Action<string>)(JsonConvert.SerializeObject(payload));
+                        Response.Remove(id);
+                    }
+                } while (client.DataAvailable);
             }
             catch (Exception e) { should_dispose = true; }
         }
