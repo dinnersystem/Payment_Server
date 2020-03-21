@@ -34,7 +34,7 @@ namespace Payment_Server
                     Application.Refresh();
                 }
             });
-            Application.Run();
+            //Application.Run();
         }
     }
 }

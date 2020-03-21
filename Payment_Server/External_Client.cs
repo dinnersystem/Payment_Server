@@ -53,7 +53,7 @@ namespace Payment_Server
                     else (item.Item2 as Action<string>)(JsonConvert.SerializeObject(payload));
                 }
             }
-            catch (Exception e) { Dispose(); }
+            catch (Exception e) { Console.Write(e.Message); Dispose(); }
         }
 
         public void Run(JObject payload, Action<string> callback) { Work.Enqueue(new Tuple<object, object>(JsonConvert.SerializeObject(payload), callback)); }

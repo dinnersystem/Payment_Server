@@ -24,6 +24,7 @@ namespace Payment_Server
 
         void Show_Error(string abstract_msg, string msg = null)
         {
+            while (errors.Count >= 10) errors.RemoveAt(0);
             errors.Add("[ERROR] " + abstract_msg);
             errors.Add("[ERROR] Timestamp " + DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss") + ".");
             if(msg != null) errors.Add(msg);
