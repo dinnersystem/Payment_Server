@@ -21,6 +21,7 @@ namespace Payment_Server
         int work_id = 0; object lock_obj = new object();
         Action<string> dispose; bool should_dispose = false;
         JObject ping = new JObject();
+        int ping_interval = Int32.Parse(Properties.Resources.ping_interval) , work_interval = Int32.Parse(Properties.Resources.work_interval);
 
         public External_Client(TcpClient client, Action<string> dispose)
         {
@@ -30,16 +31,9 @@ namespace Payment_Server
             {
                 Task.WaitAll(new List<Task>()
                 {
-                    Task.Run(() => { while (!should_dispose) Run_Request(); }),
-                    Task.Run(() => { while (!should_dispose) Run_Response(); }),
-                    Task.Run(() => 
-                    {
-                        while(!should_dispose)
-                        {
-                            Run(ping ,(string s) => { });
-                            Thread.Sleep(Int32.Parse(Properties.Resources.ping_interval));
-                        }
-                    }),
+                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Request(); }),
+                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Response(); }),
+                    Task.Run(() => { for(; !should_dispose;Thread.Sleep(ping_interval)) Run(ping ,(string s) => { }); })
                 }.ToArray());
                 dispose(ID);
             });

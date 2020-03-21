@@ -137,4 +137,8 @@
     <value>600000</value>
     <comment>The interval of ping on TCP(in miliseconds).</comment>
   </data>
+  <data name="work_interval" xml:space="preserve">
+    <value>100</value>
+    <comment>The interval of doing external request/response work(in miliseconds).</comment>
+  </data>
 </root>
