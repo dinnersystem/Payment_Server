@@ -13,7 +13,7 @@ namespace Payment_Server
             Core core = new Core();
             core.Run();
 
-            Application.Init();
+            /*Application.Init();
             var top = Application.Top;
             var win = new Window("Payment Server") { X = 1, Y = 1, Width = Dim.Fill(2), Height = Dim.Fill(1) };
             top.Add(win);
@@ -33,7 +33,7 @@ namespace Payment_Server
                     clock.SetSource(new ArrayList() { DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss") });
                     Application.Refresh();
                 }
-            });
+            });*/
             while (true) Thread.Sleep(100);
             //Application.Run();
         }

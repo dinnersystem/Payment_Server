@@ -97,7 +97,7 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 600000.
+        ///   Looks up a localized string similar to 1000.
         /// </summary>
         internal static string ping_interval {
             get {
