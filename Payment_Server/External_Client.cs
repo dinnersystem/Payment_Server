@@ -19,7 +19,7 @@ namespace Payment_Server
         Hashtable Response = Hashtable.Synchronized(new Hashtable());
         Queue Request = Queue.Synchronized(new Queue());
         int work_id = 0; object lock_obj = new object();
-        Action<string> dispose; bool should_dispose = false;
+        Action<string> dispose; bool has_disposed = false;
         JObject ping = new JObject();
         int ping_interval = Int32.Parse(Properties.Resources.ping_interval) , work_interval = Int32.Parse(Properties.Resources.work_interval);
 
@@ -27,17 +27,12 @@ namespace Payment_Server
         {
             client.NoDelay = true; this.client = client.GetStream(); this.dispose = dispose; ping["operation"] = "ping";
             Run_Response();
-            Task.Run(() =>
-            {
-                Task.WaitAll(new List<Task>()
-                {
-                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Request(); }),
-                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Response(); }),
-                    Task.Run(() => { for(; !should_dispose;Thread.Sleep(ping_interval)) Run(ping ,(string s) => { }); })
-                }.ToArray());
-                dispose(ID);
-            });
+            Task.Run(() => { for (; !has_disposed; Thread.Sleep(work_interval)) Run_Request(); });
+            Task.Run(() => { for (; !has_disposed; Thread.Sleep(work_interval)) Run_Response(); });
+            Task.Run(() => { for (; !has_disposed; Thread.Sleep(ping_interval)) Run(ping, (string s) => { }); });
         }
+
+        void Dispose() { if (!has_disposed) { dispose(ID); has_disposed = true; } }
 
         void Run_Request()
         {
@@ -51,7 +46,7 @@ namespace Payment_Server
                     client.Write(buffer, 0, buffer.Length);
                 }
             }
-            catch (Exception e) { should_dispose = true; }
+            catch (Exception e) { Dispose(); }
         }
 
         void Run_Response()
@@ -74,7 +69,7 @@ namespace Payment_Server
                     }
                 } while (client.DataAvailable);
             }
-            catch (Exception e) { should_dispose = true; }
+            catch (Exception e) { Dispose(); }
         }
 
         public void Run(JObject payload, Action<string> callback)
