@@ -25,10 +25,11 @@ namespace Payment_Server
         public static void Show_Error(string abstract_msg, string msg = null)
         {
             while (errors.Count >= 10) errors.RemoveAt(0);
+            string time = DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss");
             errors.Add("[ERROR] " + abstract_msg);
-            errors.Add("[ERROR] Timestamp " + DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss") + ".");
-            if(msg != null) errors.Add(msg);
-            logger.WriteLine("ERROR", abstract_msg, msg);
+            errors.Add("[ERROR] Timestamp " + time + ".");
+            if (msg != null) errors.Add(msg);
+            logger.WriteLine("ERROR," + time + "," + abstract_msg + "," + abstract_msg + "," + msg);
         }
         public void Run()
         {
