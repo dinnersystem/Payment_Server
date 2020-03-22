@@ -61,22 +61,18 @@ namespace Payment_Server
             {
                 byte[] temp = new byte[Int32.Parse(Properties.Resources.external_response_len)];
                 client.Read(temp, 0, temp.Length);
-                string receive = Encoding.UTF8.GetString(temp).Replace("\0" ,"");
-                try
+                string receive = "";
+                while(receive != "") Encoding.UTF8.GetString(temp).Replace("\0" ,"");
+                JObject response = (JObject)JsonConvert.DeserializeObject(receive);
+                JObject payload = (JObject)response["payload"];
+                if (response["type"].ToObject<string>() == "config") { Config = payload; ID = Config["org_id"].ToObject<string>(); }
+                else
                 {
-                    JObject response = (JObject)JsonConvert.DeserializeObject(receive);
-                    JObject payload = (JObject)response["payload"];
-                    if (response["type"].ToObject<string>() == "config") { Config = payload; ID = Config["org_id"].ToObject<string>(); }
-                    else
-                    {
-                        string id = response["work_id"].ToObject<string>();
-                        if (!Response.ContainsKey(id)) throw new Exception("Received invalid work id '" + id + "' from external client.");
-                        (Response[id] as Action<string>)(JsonConvert.SerializeObject(payload));
-                        Response.Remove(id);
-                    }
+                    string id = response["work_id"].ToObject<string>();
+                    if (!Response.ContainsKey(id)) throw new Exception("Received invalid work id '" + id + "' from external client.");
+                    (Response[id] as Action<string>)(JsonConvert.SerializeObject(payload));
+                    Response.Remove(id);
                 }
-                catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace + " " + receive); }
-                
             }
             catch (Exception e) { should_dispose = true; }
         }
