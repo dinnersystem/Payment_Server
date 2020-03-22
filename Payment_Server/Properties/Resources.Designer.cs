@@ -61,7 +61,7 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 3000.
+        ///   Looks up a localized string similar to 5000.
         /// </summary>
         internal static string ds_deconstruct {
             get {
@@ -93,6 +93,15 @@ namespace Payment_Server.Properties {
         internal static string external_response_len {
             get {
                 return ResourceManager.GetString("external_response_len", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 3000.
+        /// </summary>
+        internal static string external_timeout {
+            get {
+                return ResourceManager.GetString("external_timeout", resourceCulture);
             }
         }
         

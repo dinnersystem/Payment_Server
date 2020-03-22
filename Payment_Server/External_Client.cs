@@ -25,7 +25,8 @@ namespace Payment_Server
 
         public External_Client(TcpClient client ,Action<string> dispose)
         {
-            client.NoDelay = true; this.client = client.GetStream(); 
+            client.NoDelay = true; this.client = client.GetStream();
+            client.ReceiveTimeout = client.SendTimeout = Int32.Parse(Properties.Resources.external_timeout);
             ping["operation"] = "ping"; this.dispose = dispose; 
             Run_Response();
             Task.Run(() =>
@@ -34,7 +35,7 @@ namespace Payment_Server
                 {
                     Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Request(); }),
                     Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Response(); }),
-                    Task.Run(() => { for(; !should_dispose;Thread.Sleep(ping_interval)) Run(ping ,(string s) => { }); })
+                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(ping_interval)) Run(ping ,(string s) => { }); })
                 }.ToArray());
                 client.Close(); dispose(ID);
             });
