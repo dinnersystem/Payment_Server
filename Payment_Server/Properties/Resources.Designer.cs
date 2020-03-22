@@ -97,7 +97,7 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 500.
+        ///   Looks up a localized string similar to 100.
         /// </summary>
         internal static string external_timeout {
             get {
