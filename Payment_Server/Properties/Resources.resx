@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ds_deconstruct" xml:space="preserve">
-    <value>10000</value>
+    <value>3000</value>
     <comment>The time span from receive command to self-deconstruct(in miliseconds).</comment>
   </data>
   <data name="ds_port" xml:space="preserve">
