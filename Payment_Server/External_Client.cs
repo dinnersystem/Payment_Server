@@ -53,8 +53,8 @@ namespace Payment_Server
                         if (config) { Config = payload; ID = Config["org_id"].ToObject<string>(); }
                     }
                     catch (Exception e) { ans = e.Message + " " + e.StackTrace; }
-                    if (config) config = false; 
-                    else (item.Item2 as Action<string>)(ans);
+                    if (config) config = false;
+                    else (item.Item2 as Action<string>)(item.Item1 as string + " " + ans);
                 }
             }
             catch (Exception e) { Console.WriteLine(e.Message + "\n" + e.StackTrace); Dispose(); }
