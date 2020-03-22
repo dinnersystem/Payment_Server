@@ -40,7 +40,6 @@ namespace Payment_Server
                     byte[] buffer = new byte[Int32.Parse(Properties.Resources.payload_len)], temp = Encoding.UTF8.GetBytes(item.Item1 as string);
                     for (int i = 0; i < temp.Length; i++) buffer[i] = temp[i];
                     client.Write(buffer, 0, buffer.Length); client.Flush();
-                    Thread.Sleep(100);
                 }
                 byte[] receive = new byte[Int32.Parse(Properties.Resources.external_response_len)];
                 client.Read(receive, 0, receive.Length);
