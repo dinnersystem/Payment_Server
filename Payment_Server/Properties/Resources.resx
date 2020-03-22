@@ -142,7 +142,7 @@
     <comment>The interval of ping on TCP(in miliseconds).</comment>
   </data>
   <data name="work_interval" xml:space="preserve">
-    <value>10</value>
+    <value>50</value>
     <comment>The interval of doing external request/response work(in miliseconds).</comment>
   </data>
 </root>
