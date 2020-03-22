@@ -51,7 +51,7 @@ namespace Payment_Server
                 for (int i = 0; i < temp.Length; i++) buffer[i] = temp[i];
                 client.Write(buffer, 0, buffer.Length);
             }
-            catch (Exception e) { should_dispose = true; }
+            catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); should_dispose = true; }
         }
 
         void Run_Response()
@@ -76,7 +76,7 @@ namespace Payment_Server
                     Response.Remove(id);
                 }
             }
-            catch (Exception e) { should_dispose = true; }
+            catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); should_dispose = true; }
         }
 
         public void Run(JObject payload, Action<string> callback)
