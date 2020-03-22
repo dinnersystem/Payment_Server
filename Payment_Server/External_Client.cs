@@ -25,7 +25,7 @@ namespace Payment_Server
             client.NoDelay = true; this.client = client.GetStream(); this.dispose = dispose; ping["operation"] = "ping";
             Run_Work(true);
             Task.Run(() => { for (; !has_disposed; Thread.Sleep(work_interval)) Run_Work(false); });
-            Task.Run(() => { for (; !has_disposed; Thread.Sleep(ping_interval)) Run(ping, (string s) => { }); });
+            Task.Run(() => { for (; !has_disposed; Thread.Sleep(ping_interval)) Run(ping, (string s) => { Console.WriteLine(s); }); });
         }
         void Dispose() { if (!has_disposed) { dispose(ID); has_disposed = true; } }
         void Run_Work(bool config)
@@ -57,11 +57,7 @@ namespace Payment_Server
                     else (item.Item2 as Action<string>)(ans);
                 }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message + "\n" + e.StackTrace);
-                Dispose();
-            }
+            catch (Exception e) { Console.WriteLine(e.Message + "\n" + e.StackTrace); Dispose(); }
         }
         public void Run(JObject payload, Action<string> callback) { Work.Enqueue(new Tuple<object, object>(JsonConvert.SerializeObject(payload), callback)); }
     }
