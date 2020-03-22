@@ -79,7 +79,7 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 1024.
+        ///   Looks up a localized string similar to 65536.
         /// </summary>
         internal static string external_response_len {
             get {
