@@ -16,46 +16,79 @@ namespace Payment_Server
         public JObject Config; public string ID;
 
         NetworkStream client;
-        Queue Work = Queue.Synchronized(new Queue());
-        Action<string> dispose; bool has_disposed = false;
+        Hashtable Response = Hashtable.Synchronized(new Hashtable());
+        Queue Request = Queue.Synchronized(new Queue());
+        int work_id = 0; object lock_obj = new object();
+        Action<string> dispose; bool should_dispose = false;
         JObject ping = new JObject();
         int ping_interval = Int32.Parse(Properties.Resources.ping_interval), work_interval = Int32.Parse(Properties.Resources.work_interval);
-        public External_Client(TcpClient client, Action<string> dispose)
+
+        public External_Client(TcpClient client ,Action<string> dispose)
         {
-            client.NoDelay = true; this.client = client.GetStream(); this.dispose = dispose; ping["operation"] = "ping";
-            Run_Work(true);
-            Task.Run(() => { for (; !has_disposed; Thread.Sleep(work_interval)) Run_Work(false); });
-            Task.Run(() => { for (; !has_disposed; Thread.Sleep(ping_interval)) Run(ping, (string s) => { Console.WriteLine(s); }); });
+            client.NoDelay = true; this.client = client.GetStream();
+            client.ReceiveTimeout = client.SendTimeout = Int32.Parse(Properties.Resources.external_timeout);
+            ping["operation"] = "ping"; this.dispose = dispose; 
+            Run_Response();
+            Task.Run(() =>
+            {
+                Task.WaitAll(new List<Task>()
+                {
+                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Request(); }),
+                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Response(); }),
+                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(ping_interval)) Run(ping ,(string s) => { }); })
+                }.ToArray());
+                client.Close(); client.Dispose(); dispose(ID);
+            });
         }
-        void Dispose() { if (!has_disposed) { dispose(ID); has_disposed = true; } }
-        void Run_Work(bool config)
+
+        void Run_Request()
         {
             try
             {
-                if (Work.Count == 0 && !config) return;
-                Tuple<object, object> item = new Tuple<object, object>(null, null);
-                if (!config)
-                {
-                    item = Work.Dequeue() as Tuple<object, object>;
-                    byte[] buffer = new byte[Int32.Parse(Properties.Resources.payload_len)], temp = Encoding.UTF8.GetBytes(item.Item1 as string);
-                    for (int i = 0; i < temp.Length; i++) buffer[i] = temp[i];
-                    client.Write(buffer, 0, buffer.Length); client.Flush();
-                }
-                byte[] receive = new byte[Int32.Parse(Properties.Resources.external_response_len)];
-                client.Read(receive, 0, receive.Length);
-                string ans = "";
-                try
-                {
-                    JObject response = (JObject)JsonConvert.DeserializeObject(Encoding.UTF8.GetString(receive));
-                    JObject payload = (JObject)response["payload"];
-                    ans = JsonConvert.SerializeObject(payload) as string;
-                    if (config) { Config = payload; ID = Config["org_id"].ToObject<string>(); }
-                }
-                catch (Exception e) { ans = e.Message + " " + e.StackTrace; }
-                if (!config) (item.Item2 as Action<string>)(item.Item1 as string + " " + ans);
+                if (Request.Count == 0) return;
+                byte[] buffer = new byte[Int32.Parse(Properties.Resources.payload_len)];
+                byte[] temp = Encoding.UTF8.GetBytes(Request.Dequeue() as string);
+                for (int i = 0; i < temp.Length; i++) buffer[i] = temp[i];
+                client.Write(buffer, 0, buffer.Length);
             }
-            catch (Exception e) { Console.WriteLine(e.Message + "\n" + e.StackTrace); Dispose(); }
+            catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); should_dispose = true; }
         }
-        public void Run(JObject payload, Action<string> callback) { Work.Enqueue(new Tuple<object, object>(JsonConvert.SerializeObject(payload), callback)); }
+
+        void Run_Response()
+        {
+            try
+            {
+                byte[] temp = new byte[Int32.Parse(Properties.Resources.external_response_len)];
+                string receive = "";
+                while (receive == "")
+                {
+                    if (client.Read(temp, 0, temp.Length) == 0) return;
+                    receive = Encoding.UTF8.GetString(temp).Replace("\0", ""); 
+                }
+                JObject response, payload;
+                try { response = (JObject)JsonConvert.DeserializeObject(receive); payload = (JObject)response["payload"]; }
+                catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); return; }
+                if (response["type"].ToObject<string>() == "config") { Config = payload; ID = Config["org_id"].ToObject<string>(); }
+                else
+                {
+                    string id = response["work_id"].ToObject<string>();
+                    if (!Response.ContainsKey(id)) throw new Exception("Received invalid work id '" + id + "' from external client.");
+                    (Response[id] as Action<string>)(JsonConvert.SerializeObject(payload));
+                    Response.Remove(id);
+                }
+            }
+            catch (Exception e) { should_dispose = true; }
+        }
+
+        public void Run(JObject payload, Action<string> callback)
+        {
+            lock (lock_obj)
+            {
+                payload["work_id"] = work_id.ToString();
+                Request.Enqueue(JsonConvert.SerializeObject(payload));
+                Response.Add(payload["work_id"].ToObject<string>(), callback);
+                work_id += 1;
+            }
+        }
     }
 }

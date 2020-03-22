@@ -14,20 +14,22 @@ namespace Payment_Server
     class Core
     {
         public ConcurrentDictionary<string, External_Client> ext_client_set = new ConcurrentDictionary<string, External_Client>();
-        public List<string> errors = new List<string>();
+        public static List<string> errors = new List<string>();
+        static StreamWriter logger = new StreamWriter("payment_log.txt", true);
 
         DS_Server ds_server = new DS_Server();
         External_Server ext_server = new External_Server();
-        StreamWriter logger = new StreamWriter("payment_log.txt", true);
 
         public Core() { logger.AutoFlush = true; }
 
-        void Show_Error(string abstract_msg, string msg = null)
+        public static void Show_Error(string abstract_msg, string msg = null)
         {
-            while (errors.Count >= 10) errors.RemoveAt(0);
+            while (errors.Count >= 30) errors.RemoveAt(0);
+            string time = DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss");
             errors.Add("[ERROR] " + abstract_msg);
-            errors.Add("[ERROR] Timestamp " + DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss") + ".");
-            if(msg != null) errors.Add(msg);
+            errors.Add("[ERROR] Timestamp " + time + ".");
+            if (msg != null) errors.Add(msg);
+            logger.WriteLine("ERROR," + time + "," + abstract_msg + "," + abstract_msg + "," + msg);
         }
         public void Run()
         {

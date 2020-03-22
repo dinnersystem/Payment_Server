@@ -61,6 +61,15 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 5000.
+        /// </summary>
+        internal static string ds_deconstruct {
+            get {
+                return ResourceManager.GetString("ds_deconstruct", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 1313.
         /// </summary>
         internal static string ds_port {
@@ -88,6 +97,15 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 5000.
+        /// </summary>
+        internal static string external_timeout {
+            get {
+                return ResourceManager.GetString("external_timeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 65536.
         /// </summary>
         internal static string payload_len {
@@ -106,7 +124,7 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 10.
+        ///   Looks up a localized string similar to 50.
         /// </summary>
         internal static string work_interval {
             get {
