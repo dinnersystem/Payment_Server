@@ -65,8 +65,9 @@ namespace Payment_Server
                     if (client.Read(temp, 0, temp.Length) == 0) return;
                     receive = Encoding.UTF8.GetString(temp).Replace("\0", ""); 
                 }
-                JObject response = (JObject)JsonConvert.DeserializeObject(receive);
-                JObject payload = (JObject)response["payload"];
+                JObject response, payload;
+                try { response = (JObject)JsonConvert.DeserializeObject(receive); payload = (JObject)response["payload"]; }
+                catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); return; }
                 if (response["type"].ToObject<string>() == "config") { Config = payload; ID = Config["org_id"].ToObject<string>(); }
                 else
                 {
@@ -76,7 +77,7 @@ namespace Payment_Server
                     Response.Remove(id);
                 }
             }
-            catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); should_dispose = true; }
+            catch (Exception e) { should_dispose = true; }
         }
 
         public void Run(JObject payload, Action<string> callback)
