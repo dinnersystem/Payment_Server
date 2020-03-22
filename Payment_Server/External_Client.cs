@@ -25,7 +25,8 @@ namespace Payment_Server
 
         public External_Client(TcpClient client ,Action<string> dispose)
         {
-            client.NoDelay = true; this.client = client.GetStream(); ping["operation"] = "ping"; this.dispose = dispose; 
+            client.NoDelay = true; this.client = client.GetStream(); 
+            ping["operation"] = "ping"; this.dispose = dispose; 
             Run_Response();
             Task.Run(() =>
             {

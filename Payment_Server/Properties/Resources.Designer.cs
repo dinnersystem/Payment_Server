@@ -61,6 +61,15 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 3000.
+        /// </summary>
+        internal static string ds_deconstruct {
+            get {
+                return ResourceManager.GetString("ds_deconstruct", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 1313.
         /// </summary>
         internal static string ds_port {
