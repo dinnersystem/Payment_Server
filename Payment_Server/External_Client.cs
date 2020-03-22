@@ -60,9 +60,8 @@ namespace Payment_Server
             try
             {
                 byte[] temp = new byte[Int32.Parse(Properties.Resources.external_response_len)];
-                client.Read(temp, 0, temp.Length);
                 string receive = "";
-                while(receive != "") Encoding.UTF8.GetString(temp).Replace("\0" ,"");
+                while (receive != "") { client.Read(temp, 0, temp.Length); Encoding.UTF8.GetString(temp).Replace("\0", ""); }
                 JObject response = (JObject)JsonConvert.DeserializeObject(receive);
                 JObject payload = (JObject)response["payload"];
                 if (response["type"].ToObject<string>() == "config") { Config = payload; ID = Config["org_id"].ToObject<string>(); }
