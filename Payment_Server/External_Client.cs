@@ -53,6 +53,7 @@ namespace Payment_Server
                 }
                 catch (Exception e) { ans = e.Message + " " + e.StackTrace; }
                 if (!config) (item.Item2 as Action<string>)(item.Item1 as string + " " + ans);
+                Thread.Sleep(1000);
             }
             catch (Exception e) { Console.WriteLine(e.Message + "\n" + e.StackTrace); Dispose(); }
         }
