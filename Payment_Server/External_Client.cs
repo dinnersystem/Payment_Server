@@ -32,7 +32,7 @@ namespace Payment_Server
         {
             try
             {
-                if (Work.Count == 0) return;
+                if (Work.Count == 0 && !config) return;
                 Tuple<object, object> item = new Tuple<object, object>(null, null);
                 if (!config)
                 {
