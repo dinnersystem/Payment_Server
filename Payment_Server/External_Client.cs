@@ -32,30 +32,26 @@ namespace Payment_Server
         {
             try
             {
-                while (config || Work.Count > 0)
+                Tuple<object, object> item = new Tuple<object, object>(null, null);
+                if (!config)
                 {
-                    Tuple<object, object> item = new Tuple<object, object>(null, null);
-                    if (!config)
-                    {
-                        item = Work.Dequeue() as Tuple<object, object>;
-                        byte[] buffer = new byte[Int32.Parse(Properties.Resources.payload_len)], temp = Encoding.UTF8.GetBytes(item.Item1 as string);
-                        for (int i = 0; i < temp.Length; i++) buffer[i] = temp[i];
-                        client.Write(buffer, 0, buffer.Length);
-                    }
-                    byte[] receive = new byte[Int32.Parse(Properties.Resources.external_response_len)];
-                    client.Read(receive, 0, receive.Length);
-                    string ans = "";
-                    try
-                    {
-                        JObject response = (JObject)JsonConvert.DeserializeObject(Encoding.UTF8.GetString(receive));
-                        JObject payload = (JObject)response["payload"];
-                        ans = JsonConvert.SerializeObject(payload) as string;
-                        if (config) { Config = payload; ID = Config["org_id"].ToObject<string>(); }
-                    }
-                    catch (Exception e) { ans = e.Message + " " + e.StackTrace; }
-                    if (config) config = false;
-                    else (item.Item2 as Action<string>)(item.Item1 as string + " " + ans);
+                    item = Work.Dequeue() as Tuple<object, object>;
+                    byte[] buffer = new byte[Int32.Parse(Properties.Resources.payload_len)], temp = Encoding.UTF8.GetBytes(item.Item1 as string);
+                    for (int i = 0; i < temp.Length; i++) buffer[i] = temp[i];
+                    client.Write(buffer, 0, buffer.Length);
                 }
+                byte[] receive = new byte[Int32.Parse(Properties.Resources.external_response_len)];
+                client.Read(receive, 0, receive.Length);
+                string ans = "";
+                try
+                {
+                    JObject response = (JObject)JsonConvert.DeserializeObject(Encoding.UTF8.GetString(receive));
+                    JObject payload = (JObject)response["payload"];
+                    ans = JsonConvert.SerializeObject(payload) as string;
+                    if (config) { Config = payload; ID = Config["org_id"].ToObject<string>(); }
+                }
+                catch (Exception e) { ans = e.Message + " " + e.StackTrace; }
+                if (!config) (item.Item2 as Action<string>)(item.Item1 as string + " " + ans);
             }
             catch (Exception e) { Console.WriteLine(e.Message + "\n" + e.StackTrace); Dispose(); }
         }
