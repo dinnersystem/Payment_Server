@@ -15,7 +15,7 @@ namespace Payment_Server
     {
         public JObject Config; public string ID;
 
-        NetworkStream client;
+        NetworkStream stream; TcpClient client;
         Hashtable Response = Hashtable.Synchronized(new Hashtable());
         Queue Request = Queue.Synchronized(new Queue());
         int work_id = 0; object lock_obj = new object();
@@ -23,11 +23,11 @@ namespace Payment_Server
         JObject ping = new JObject();
         int ping_interval = Int32.Parse(Properties.Resources.ping_interval), work_interval = Int32.Parse(Properties.Resources.work_interval);
 
-        public External_Client(TcpClient client ,Action<string> dispose)
+        public External_Client(TcpClient client, Action<string> dispose)
         {
-            client.NoDelay = true; this.client = client.GetStream();
+            this.client = client; client.NoDelay = true; this.stream = client.GetStream();
             client.ReceiveTimeout = client.SendTimeout = Int32.Parse(Properties.Resources.external_timeout);
-            ping["operation"] = "ping"; this.dispose = dispose; 
+            ping["operation"] = "ping"; this.dispose = dispose;
             Run_Response();
             Task.Run(() =>
             {
@@ -37,7 +37,7 @@ namespace Payment_Server
                     Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Response(); }),
                     Task.Run(() => { for (; !should_dispose;Thread.Sleep(ping_interval)) Run(ping ,(string s) => { }); })
                 }.ToArray());
-                client.Close(); client.Dispose(); dispose(ID);
+                stream.Close(); client.Close(); client.Dispose(); dispose(ID);
             });
         }
 
@@ -49,7 +49,7 @@ namespace Payment_Server
                 byte[] buffer = new byte[Int32.Parse(Properties.Resources.payload_len)];
                 byte[] temp = Encoding.UTF8.GetBytes(Request.Dequeue() as string);
                 for (int i = 0; i < temp.Length; i++) buffer[i] = temp[i];
-                client.Write(buffer, 0, buffer.Length);
+                stream.Write(buffer, 0, buffer.Length);
             }
             catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); should_dispose = true; }
         }
@@ -62,8 +62,8 @@ namespace Payment_Server
                 string receive = "";
                 while (receive == "")
                 {
-                    if (client.Read(temp, 0, temp.Length) == 0) return;
-                    receive = Encoding.UTF8.GetString(temp).Replace("\0", ""); 
+                    if (stream.Read(temp, 0, temp.Length) == 0) return;
+                    receive = Encoding.UTF8.GetString(temp).Replace("\0", "");
                 }
                 JObject response, payload;
                 try { response = (JObject)JsonConvert.DeserializeObject(receive); payload = (JObject)response["payload"]; }
