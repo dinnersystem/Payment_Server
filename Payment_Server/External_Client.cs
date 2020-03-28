@@ -15,33 +15,29 @@ namespace Payment_Server
     {
         public JObject Config; public string ID;
 
-        NetworkStream client;
+        NetworkStream stream; TcpClient client;
         Hashtable Response = Hashtable.Synchronized(new Hashtable());
         Queue Request = Queue.Synchronized(new Queue());
         int work_id = 0; object lock_obj = new object();
         Action<string> dispose; bool should_dispose = false;
         JObject ping = new JObject();
+        int ping_interval = Int32.Parse(Properties.Resources.ping_interval), work_interval = Int32.Parse(Properties.Resources.work_interval);
 
         public External_Client(TcpClient client, Action<string> dispose)
         {
-            client.NoDelay = true; this.client = client.GetStream(); this.dispose = dispose; ping["operation"] = "ping";
+            this.client = client; client.NoDelay = true; this.stream = client.GetStream();
+            client.ReceiveTimeout = client.SendTimeout = Int32.Parse(Properties.Resources.external_timeout);
+            ping["operation"] = "ping"; this.dispose = dispose;
             Run_Response();
             Task.Run(() =>
             {
                 Task.WaitAll(new List<Task>()
                 {
-                    Task.Run(() => { while (!should_dispose) Run_Request(); }),
-                    Task.Run(() => { while (!should_dispose) Run_Response(); }),
-                    Task.Run(() => 
-                    {
-                        while(!should_dispose)
-                        {
-                            Run(ping ,(string s) => { });
-                            Thread.Sleep(Int32.Parse(Properties.Resources.ping_interval));
-                        }
-                    }),
+                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Request(); }),
+                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Response(); }),
+                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(ping_interval)) Run(ping ,(string s) => { }); })
                 }.ToArray());
-                dispose(ID);
+                stream.Close(); client.Close(); client.Dispose(); dispose(ID);
             });
         }
 
@@ -49,15 +45,13 @@ namespace Payment_Server
         {
             try
             {
-                if (Request.Count > 0)
-                {
-                    byte[] buffer = new byte[Int32.Parse(Properties.Resources.payload_len)];
-                    byte[] temp = Encoding.UTF8.GetBytes(Request.Dequeue() as string);
-                    for (int i = 0; i < temp.Length; i++) buffer[i] = temp[i];
-                    client.Write(buffer, 0, buffer.Length);
-                }
+                if (Request.Count == 0) return;
+                byte[] buffer = new byte[Int32.Parse(Properties.Resources.payload_len)];
+                byte[] temp = Encoding.UTF8.GetBytes(Request.Dequeue() as string);
+                for (int i = 0; i < temp.Length; i++) buffer[i] = temp[i];
+                stream.Write(buffer, 0, buffer.Length);
             }
-            catch (Exception e) { should_dispose = true; }
+            catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); should_dispose = true; }
         }
 
         void Run_Response()
@@ -65,9 +59,15 @@ namespace Payment_Server
             try
             {
                 byte[] temp = new byte[Int32.Parse(Properties.Resources.external_response_len)];
-                client.Read(temp, 0, temp.Length);
-                JObject response = (JObject)JsonConvert.DeserializeObject(Encoding.UTF8.GetString(temp));
-                JObject payload = (JObject)response["payload"];
+                string receive = "";
+                while (receive == "")
+                {
+                    if (stream.Read(temp, 0, temp.Length) == 0) return;
+                    receive = Encoding.UTF8.GetString(temp).Replace("\0", "");
+                }
+                JObject response, payload;
+                try { response = (JObject)JsonConvert.DeserializeObject(receive); payload = (JObject)response["payload"]; }
+                catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); return; }
                 if (response["type"].ToObject<string>() == "config") { Config = payload; ID = Config["org_id"].ToObject<string>(); }
                 else
                 {

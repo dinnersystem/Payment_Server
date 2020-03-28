@@ -4,6 +4,8 @@ using System.Text;
 using System.Net.Sockets;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Payment_Server
 {
@@ -11,6 +13,7 @@ namespace Payment_Server
     {
         NetworkStream client;
         public readonly JObject Payload;
+        int deconstruct = Int32.Parse(Properties.Resources.ds_deconstruct);
 
         public DS_Client(TcpClient client)
         {
@@ -23,7 +26,9 @@ namespace Payment_Server
                 payload.Append(Encoding.UTF8.GetString(temp));
             } while (this.client.DataAvailable);
             this.Payload = (JObject)JsonConvert.DeserializeObject(payload.ToString());
+            Self_Deconstruct();
         }
+        void Self_Deconstruct() { Task.Run(() => { Thread.Sleep(deconstruct); client.Close(); }); }
 
         public void Response(string s) { client.Write(new ReadOnlySpan<byte>(Encoding.UTF8.GetBytes(s))); client.Close(); }
 

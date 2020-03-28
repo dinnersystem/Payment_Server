@@ -29,7 +29,7 @@ namespace Payment_Server
                     Thread.Sleep(1000);
                     ArrayList clients = new ArrayList();
                     lock (core.ext_client_set) foreach (var pair in core.ext_client_set) clients.Add("[ONLINE] External Client: " + pair.Key);
-                    list.SetSource(clients); err.SetSource(core.errors);
+                    list.SetSource(clients); err.SetSource(Core.errors);
                     clock.SetSource(new ArrayList() { DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("HH:mm:ss") });
                     Application.Refresh();
                 }

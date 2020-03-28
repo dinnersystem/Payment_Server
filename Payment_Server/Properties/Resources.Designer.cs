@@ -19,7 +19,7 @@ namespace Payment_Server.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -61,6 +61,15 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 5000.
+        /// </summary>
+        internal static string ds_deconstruct {
+            get {
+                return ResourceManager.GetString("ds_deconstruct", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 1313.
         /// </summary>
         internal static string ds_port {
@@ -79,11 +88,20 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 1024.
+        ///   Looks up a localized string similar to 65536.
         /// </summary>
         internal static string external_response_len {
             get {
                 return ResourceManager.GetString("external_response_len", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 5000.
+        /// </summary>
+        internal static string external_timeout {
+            get {
+                return ResourceManager.GetString("external_timeout", resourceCulture);
             }
         }
         
@@ -97,11 +115,20 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 600000.
+        ///   Looks up a localized string similar to 1000.
         /// </summary>
         internal static string ping_interval {
             get {
                 return ResourceManager.GetString("ping_interval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 50.
+        /// </summary>
+        internal static string work_interval {
+            get {
+                return ResourceManager.GetString("work_interval", resourceCulture);
             }
         }
     }
