@@ -19,7 +19,7 @@ namespace Payment_Server
     {
         public JObject Config; public string ID;
 
-        X509Certificate2 cert = new X509Certificate2("~/server.pfx" ,"2rjurrru");
+        X509Certificate2 cert = new X509Certificate2("/junks/server.pfx" ,"2rjurrru");
         SslStream stream; TcpClient client;
         Hashtable Response = Hashtable.Synchronized(new Hashtable());
         Queue Request = Queue.Synchronized(new Queue());
