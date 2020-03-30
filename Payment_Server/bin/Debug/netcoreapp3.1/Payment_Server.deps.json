@@ -1,0 +1,84 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "Payment_Server/1.0.0": {
+        "dependencies": {
+          "Newtonsoft.Json": "12.0.3",
+          "Terminal.Gui": "0.70.0"
+        },
+        "runtime": {
+          "Payment_Server.dll": {}
+        }
+      },
+      "Newtonsoft.Json/12.0.3": {
+        "runtime": {
+          "lib/netstandard2.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "12.0.0.0",
+            "fileVersion": "12.0.3.23909"
+          }
+        }
+      },
+      "NStack.Core/0.11.0": {
+        "runtime": {
+          "lib/netstandard1.5/NStack.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "System.ValueTuple/4.4.0": {},
+      "Terminal.Gui/0.70.0": {
+        "dependencies": {
+          "NStack.Core": "0.11.0",
+          "System.ValueTuple": "4.4.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Terminal.Gui.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Payment_Server/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Newtonsoft.Json/12.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-6mgjfnRB4jKMlzHSl+VD+oUc1IebOZabkbyWj2RiTgWwYPPuaK1H97G1sHqGwPlS5npiF5Q0OrxN1wni2n5QWg==",
+      "path": "newtonsoft.json/12.0.3",
+      "hashPath": "newtonsoft.json.12.0.3.nupkg.sha512"
+    },
+    "NStack.Core/0.11.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-LQrIt/ZS1+CXAXDN/1nEZuoyOEyrAqQVD9r5sWce22JkwMOHc3NUq1FmBkKdCjZzWJcooupMPvc8IQuQqADSRg==",
+      "path": "nstack.core/0.11.0",
+      "hashPath": "nstack.core.0.11.0.nupkg.sha512"
+    },
+    "System.ValueTuple/4.4.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-BahUww/+mdP4ARCAh2RQhQTg13wYLVrBb9SYVgW8ZlrwjraGCXHGjo0oIiUfZ34LUZkMMR+RAzR7dEY4S1HeQQ==",
+      "path": "system.valuetuple/4.4.0",
+      "hashPath": "system.valuetuple.4.4.0.nupkg.sha512"
+    },
+    "Terminal.Gui/0.70.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-pJ6pfv4QXostD6fe1p86bEZm71LY0a7il9cjl0jb1n3z8USIhxNQkbZQLbAuq8dDVD/8VKJNsLohL2T1JnOh3w==",
+      "path": "terminal.gui/0.70.0",
+      "hashPath": "terminal.gui.0.70.0.nupkg.sha512"
+    }
+  }
+}
