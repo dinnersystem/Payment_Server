@@ -8,10 +8,6 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Threading;
 using Newtonsoft.Json;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Authentication;
-
 
 namespace Payment_Server
 {
@@ -19,8 +15,7 @@ namespace Payment_Server
     {
         public JObject Config; public string ID;
 
-        X509Certificate2 cert = new X509Certificate2("/junks/server.pfx" ,"2rjurrru");
-        SslStream stream; TcpClient client;
+        NetworkStream stream; TcpClient client;
         Hashtable Response = Hashtable.Synchronized(new Hashtable());
         Queue Request = Queue.Synchronized(new Queue());
         int work_id = 0; object lock_obj = new object();
@@ -30,8 +25,8 @@ namespace Payment_Server
 
         public External_Client(TcpClient client, Action<string> dispose)
         {
-            this.client = client; client.NoDelay = true; client.ReceiveTimeout = client.SendTimeout = Int32.Parse(Properties.Resources.external_timeout); 
-            stream = new SslStream(client.GetStream(), false); stream.AuthenticateAsServer(cert, clientCertificateRequired: false, checkCertificateRevocation: true);
+            this.client = client; client.NoDelay = true; this.stream = client.GetStream();
+            client.ReceiveTimeout = client.SendTimeout = Int32.Parse(Properties.Resources.external_timeout);
             ping["operation"] = "ping"; this.dispose = dispose;
             Run_Response();
             Task.Run(() =>
