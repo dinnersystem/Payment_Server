@@ -9,7 +9,6 @@ namespace Payment_Server
     class External_Server
     {
         TcpListener listener = new TcpListener(IPAddress.Any, Int32.Parse(Properties.Resources.external_port));
-
         public External_Server() { listener.Start(); }
         public Tuple<string, External_Client> Get_Client(Action<string> dispose)
         {
