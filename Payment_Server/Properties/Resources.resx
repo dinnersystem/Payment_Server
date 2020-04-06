@@ -122,11 +122,11 @@
     <comment>The time span from receive command to self-deconstruct(in miliseconds).</comment>
   </data>
   <data name="ds_port" xml:space="preserve">
-    <value>1313</value>
+    <value>1101</value>
     <comment>The port for connection between dinnersystem and payment server. Do not occupy this  port.</comment>
   </data>
   <data name="external_port" xml:space="preserve">
-    <value>1101</value>
+    <value>5269</value>
     <comment>The port for connection between payment server and external clients. Do not occupy this port.</comment>
   </data>
   <data name="external_response_len" xml:space="preserve">
