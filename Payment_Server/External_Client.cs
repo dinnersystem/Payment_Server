@@ -56,13 +56,13 @@ namespace Payment_Server
             try
             {
                 byte[] temp = new byte[Int32.Parse(Properties.Resources.external_response_len)];
-                string receive = "", str_fragment = "";
-                while (str_fragment == "")
+                int offset = 0, new_len;
+                while (offset < temp.Length)
                 {
-                    if (stream.Read(temp, 0, temp.Length) == 0) return;
-                    str_fragment = Encoding.UTF8.GetString(temp).Replace("\0", "");
-                    receive += str_fragment;
+                    if ((new_len = stream.Read(temp, offset, temp.Length - offset)) == 0) return;
+                    else offset += new_len;
                 }
+                string receive = Encoding.UTF8.GetString(temp).Replace("\0", "");
                 JObject response, payload;
                 try { response = (JObject)JsonConvert.DeserializeObject(receive); payload = (JObject)response["payload"]; }
                 catch (Exception e) { Core.Show_Error(e.Message + "\nerrmsg= " + receive, e.StackTrace); return; }
