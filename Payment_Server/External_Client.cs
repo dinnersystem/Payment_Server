@@ -36,7 +36,7 @@ namespace Payment_Server
                     Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Response(); }),
                     Task.Run(() => { for (; !should_dispose;Thread.Sleep(ping_interval)) Run(ping ,(string s) => { }); })
                 }.ToArray());
-                stream.Close(); client.Close(); client.Dispose(); dispose(ID);
+                while (true) try { stream.Close(); client.Close(); client.Dispose(); dispose(ID); break; } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); }
             });
         }
         void Run_Request()
