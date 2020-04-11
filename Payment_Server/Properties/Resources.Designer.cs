@@ -70,7 +70,7 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 1313.
+        ///   Looks up a localized string similar to 1101.
         /// </summary>
         internal static string ds_port {
             get {
@@ -79,7 +79,7 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 1101.
+        ///   Looks up a localized string similar to 5269.
         /// </summary>
         internal static string external_port {
             get {
@@ -124,7 +124,7 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 50.
+        ///   Looks up a localized string similar to 10.
         /// </summary>
         internal static string work_interval {
             get {
