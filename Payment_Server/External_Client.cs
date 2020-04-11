@@ -22,7 +22,6 @@ namespace Payment_Server
         Action<string> dispose; bool should_dispose = false;
         JObject ping = new JObject();
         int ping_interval = Int32.Parse(Properties.Resources.ping_interval), work_interval = Int32.Parse(Properties.Resources.work_interval);
-
         public External_Client(TcpClient client, Action<string> dispose)
         {
             this.client = client; client.NoDelay = true; this.stream = client.GetStream();
@@ -40,7 +39,6 @@ namespace Payment_Server
                 stream.Close(); client.Close(); client.Dispose(); dispose(ID);
             });
         }
-
         void Run_Request()
         {
             try
@@ -53,7 +51,6 @@ namespace Payment_Server
             }
             catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); should_dispose = true; }
         }
-
         void Run_Response()
         {
             try
@@ -67,7 +64,7 @@ namespace Payment_Server
                 }
                 JObject response, payload;
                 try { response = (JObject)JsonConvert.DeserializeObject(receive); payload = (JObject)response["payload"]; }
-                catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); return; }
+                catch (Exception e) { Core.Show_Error(e.Message + "\nerrmsg= " + receive, e.StackTrace); return; }
                 if (response["type"].ToObject<string>() == "config") { Config = payload; ID = Config["org_id"].ToObject<string>(); }
                 else
                 {
@@ -79,7 +76,6 @@ namespace Payment_Server
             }
             catch (Exception e) { should_dispose = true; }
         }
-
         public void Run(JObject payload, Action<string> callback)
         {
             lock (lock_obj)
