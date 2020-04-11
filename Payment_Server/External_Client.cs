@@ -56,11 +56,12 @@ namespace Payment_Server
             try
             {
                 byte[] temp = new byte[Int32.Parse(Properties.Resources.external_response_len)];
-                string receive = "";
-                while (receive == "")
+                string receive = "", str_fragment = "";
+                while (str_fragment == "")
                 {
                     if (stream.Read(temp, 0, temp.Length) == 0) return;
-                    receive = Encoding.UTF8.GetString(temp).Replace("\0", "");
+                    str_fragment = Encoding.UTF8.GetString(temp).Replace("\0", "");
+                    receive += str_fragment;
                 }
                 JObject response, payload;
                 try { response = (JObject)JsonConvert.DeserializeObject(receive); payload = (JObject)response["payload"]; }
