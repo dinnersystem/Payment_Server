@@ -10,7 +10,7 @@ namespace Payment_Server
     {
         TcpListener listener = new TcpListener(IPAddress.Any, Int32.Parse(Properties.Resources.external_port));
         public External_Server() { listener.Start(); }
-        public Tuple<string, External_Client> Get_Client(Action<string> dispose)
+        public Tuple<string, External_Client> Get_Client(Action<string, External_Client> dispose)
         {
             External_Client client = new External_Client(listener.AcceptTcpClient(), dispose);
             return new Tuple<string, External_Client>(client.ID, client);

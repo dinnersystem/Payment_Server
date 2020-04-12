@@ -19,10 +19,10 @@ namespace Payment_Server
         Hashtable Response = Hashtable.Synchronized(new Hashtable());
         Queue Request = Queue.Synchronized(new Queue());
         int work_id = 0; object lock_obj = new object();
-        Action<string> dispose; bool should_dispose = false;
+        Action<string, External_Client> dispose; bool should_dispose = false;
         JObject ping = new JObject();
         int ping_interval = Int32.Parse(Properties.Resources.ping_interval), work_interval = Int32.Parse(Properties.Resources.work_interval);
-        public External_Client(TcpClient client, Action<string> dispose)
+        public External_Client(TcpClient client, Action<string, External_Client> dispose)
         {
             this.client = client; client.NoDelay = true; this.stream = client.GetStream();
             client.ReceiveTimeout = client.SendTimeout = Int32.Parse(Properties.Resources.external_timeout);
@@ -40,9 +40,10 @@ namespace Payment_Server
                 while (true) try { stream.Dispose(); break; } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); }
                 while (true) try { client.Close(); break; } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); }
                 while (true) try { client.Dispose(); break; } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); }
-                while (true) try { dispose(ID); break; } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); }
+                try { dispose(ID); } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); } /* Just disregard the exception if it fails. */
             });
         }
+        ~External_Client() { should_dispose = true; }
         void Run_Request()
         {
             try
@@ -70,7 +71,11 @@ namespace Payment_Server
                 JObject response, payload;
                 try { response = (JObject)JsonConvert.DeserializeObject(receive); payload = (JObject)response["payload"]; }
                 catch (Exception e) { Core.Show_Error(e.Message + "\nerrmsg= " + receive, e.StackTrace); return; }
-                if (response["type"].ToObject<string>() == "config") { Config = payload; ID = Config["org_id"].ToObject<string>(); }
+                if (response["type"].ToObject<string>() == "config") 
+                { 
+                    Config = payload;
+                    if ((ID = Config["org_id"].ToObject<string>()) != "1") throw new Exception("Invalid config " + receive);
+                }
                 else
                 {
                     string id = response["work_id"].ToObject<string>();

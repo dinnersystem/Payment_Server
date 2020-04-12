@@ -39,11 +39,12 @@ namespace Payment_Server
                 {
                     try
                     {
-                        var client = ext_server.Get_Client((string id) => { ext_client_set.TryRemove(id, out External_Client ext_client); });
+                        var client = ext_server.Get_Client((string id, External_Client self) =>
+                        { if (ext_client_set[id].Equals(self)) ext_client_set.TryRemove(id, out External_Client ext_client); });
                         if (ext_client_set.ContainsKey(client.Item1)) ext_client_set.TryRemove(client.Item1, out External_Client ext_client);
                         ext_client_set.TryAdd(client.Item1, client.Item2);
                     }
-                    catch (Exception e) { Show_Error(e.Message); }
+                    catch (Exception e) { Show_Error(e.Message, e.StackTrace); }
                 }
             });
 
@@ -68,7 +69,7 @@ namespace Payment_Server
                             });
                         }
                     }
-                    catch (Exception e) { Show_Error(e.Message); }
+                    catch (Exception e) { Show_Error(e.Message, e.StackTrace); }
                 }
             });
         }
