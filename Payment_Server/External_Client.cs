@@ -40,7 +40,7 @@ namespace Payment_Server
                 while (true) try { stream.Dispose(); break; } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); }
                 while (true) try { client.Close(); break; } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); }
                 while (true) try { client.Dispose(); break; } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); }
-                try { dispose(ID); } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); } /* Just disregard the exception if it fails. */
+                try { dispose(ID, this); } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); } /* Just disregard the exception if it fails. */
             });
         }
         ~External_Client() { should_dispose = true; }
