@@ -134,14 +134,14 @@
     <comment>The buffer size for receiving response from external clients.</comment>
   </data>
   <data name="external_timeout" xml:space="preserve">
-    <value>15000</value>
+    <value>150</value>
   </data>
   <data name="payload_len" xml:space="preserve">
     <value>65536</value>
     <comment>The buffer size for order(payload).</comment>
   </data>
   <data name="ping_interval" xml:space="preserve">
-    <value>1000</value>
+    <value>50</value>
     <comment>The interval of ping on TCP(in miliseconds).</comment>
   </data>
   <data name="work_interval" xml:space="preserve">

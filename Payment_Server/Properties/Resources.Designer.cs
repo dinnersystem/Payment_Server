@@ -97,7 +97,7 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 15000.
+        ///   Looks up a localized string similar to 150.
         /// </summary>
         internal static string external_timeout {
             get {
@@ -115,7 +115,7 @@ namespace Payment_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 1000.
+        ///   Looks up a localized string similar to 50.
         /// </summary>
         internal static string ping_interval {
             get {
