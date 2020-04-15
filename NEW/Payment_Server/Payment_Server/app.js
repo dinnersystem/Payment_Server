@@ -44,9 +44,11 @@ app.get('/show_work', function (req, res) {
 	res.send(JSON.stringify(events[req.query.org_id]));
 });
 app.post('/submit_work', function (req, res) {
-	delete events[req.body.org_id][req.body.work_id]
-	log("EXT," + JSON.stringify(req.body.msg))
+	if (events[req.body.org_id][req.body.work_id] == undefined) { return }
+	log("EXT," + JSON.stringify(req.body))
 	callbacks[req.body.org_id][req.body.work_id](req.body.msg);
+	delete events[req.body.org_id][req.body.work_id]
+	delete callbacks[req.body.org_id][req.body.work_id]
 	res.send("OK")
 });
 app.listen(5269, function () {
