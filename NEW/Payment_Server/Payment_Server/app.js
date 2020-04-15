@@ -33,7 +33,7 @@ var server = net.createServer(function (socket) {
 		log("DS," + JSON.stringify(json))
 	});
 });
-server.listen(1101, '127.0.0.1');
+server.listen(1101, '0.0.0.0');
 
 
 
