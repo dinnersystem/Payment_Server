@@ -41,7 +41,13 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.get('/show_work', function (req, res) {
-	res.send(JSON.stringify(events[req.query.org_id]));
+	var resp = {}
+	var count = 0
+	for (var key in events[req.query.org_id]) {
+		if (dictionary.hasOwnProperty(key)) resp[key] = events[req.query.org_id][key]
+		if (count > 100) break
+	}
+	res.send(JSON.stringify(resp));
 });
 app.post('/submit_work', function (req, res) {
 	if (events[req.body.org_id][req.body.work_id] == undefined) { return }
