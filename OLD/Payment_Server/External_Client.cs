@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Threading;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace Payment_Server
 {
@@ -15,35 +16,32 @@ namespace Payment_Server
     {
         public JObject Config; public string ID;
 
+        TcpListener listener = new TcpListener(IPAddress.Any, Int32.Parse(Properties.Resources.external_port));
         NetworkStream stream; TcpClient client;
         Hashtable Response = Hashtable.Synchronized(new Hashtable());
         Queue Request = Queue.Synchronized(new Queue());
         int work_id = 0; object lock_obj = new object();
-        Action<string, External_Client> dispose; bool should_dispose = false;
         JObject ping = new JObject();
         int ping_interval = Int32.Parse(Properties.Resources.ping_interval), work_interval = Int32.Parse(Properties.Resources.work_interval);
-        public External_Client(TcpClient client, Action<string, External_Client> dispose)
+        public External_Client(string s)
         {
-            this.client = client; client.NoDelay = true; this.stream = client.GetStream();
+            client.NoDelay = true; this.stream = client.GetStream();
             client.ReceiveTimeout = client.SendTimeout = Int32.Parse(Properties.Resources.external_timeout);
-            ping["operation"] = "ping"; this.dispose = dispose;
             Run_Response();
             Task.Run(() =>
             {
                 Task.WaitAll(new List<Task>()
                 {
-                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Request(); }),
-                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(work_interval)) Run_Response(); }),
-                    Task.Run(() => { for (; !should_dispose;Thread.Sleep(ping_interval)) Run(ping ,(string s) => { }); })
+                    Task.Run(() => { for (; true;Thread.Sleep(work_interval)) Run_Request(); }),
+                    Task.Run(() => { for (; true;Thread.Sleep(work_interval)) Run_Response(); }),
+                    /* Task.Run(() => { for (; !should_dispose;Thread.Sleep(ping_interval)) Run(ping ,(string s) => { }); }) */
                 }.ToArray());
                 while (true) try { stream.Close(); break; } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); }
                 while (true) try { stream.Dispose(); break; } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); }
                 while (true) try { client.Close(); break; } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); }
                 while (true) try { client.Dispose(); break; } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); }
-                try { dispose(ID, this); } catch (Exception e) { Core.Show_Error(e.Message, e.StackTrace); } /* Just disregard the exception if it fails. */
             });
         }
-        ~External_Client() { should_dispose = true; }
         void Run_Request()
         {
             try
