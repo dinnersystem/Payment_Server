@@ -43,9 +43,9 @@ var server = net.createServer(function (socket) {
 			response_DS({
 				org_id: json.org_id,
 				work_id: wid,
-				msg: "Timeout"
-            })
-        }, 5000)
+				msg: { error: "Timeout" }
+			})
+		}, 5000)
 	});
 });
 server.listen(1101, '0.0.0.0');
@@ -56,13 +56,6 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.get('/show_work', function (req, res) {
-	/* var resp = {}
-	var count = 0
-	for (var key in events[req.query.org_id]) {
-		if (dictionary.hasOwnProperty(key)) resp[key] = events[req.query.org_id][key]
-		if (count > 100) break
-	}
-	res.send(JSON.stringify(resp)); */
 	res.send(JSON.stringify(events[req.query.org_id]))
 });
 app.post('/submit_work', function (req, res) {
