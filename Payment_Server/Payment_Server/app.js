@@ -10,12 +10,6 @@ function log(msg) {
 	logger.write(output);
 	console.log(output);
 }
-function response_DS(work) {
-	log("EXT," + JSON.stringify(work))
-	callbacks[work.org_id][work.work_id](work.msg);
-	delete events[work.org_id][work.work_id]
-	delete callbacks[work.org_id][work.work_id]
-}
 
 var events = {
 	"1": {}
@@ -23,6 +17,13 @@ var events = {
 var callbacks = {
 	"1": {}
 }
+function response_DS(work) {
+	log("EXT," + JSON.stringify(work))
+	callbacks[work.org_id][work.work_id](work.msg);
+	delete events[work.org_id][work.work_id]
+	delete callbacks[work.org_id][work.work_id]
+}
+
 
 
 var work_id = 0;
