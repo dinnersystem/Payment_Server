@@ -18,6 +18,7 @@ var callbacks = {
 	"1": {}
 }
 function response_DS(work) {
+	if (events[work.org_id][work.work_id] == undefined) { return }
 	log("EXT," + JSON.stringify(work))
 	callbacks[work.org_id][work.work_id](work.msg);
 	delete events[work.org_id][work.work_id]
@@ -65,10 +66,7 @@ app.get('/show_work', function (req, res) {
 	res.send(JSON.stringify(events[req.query.org_id]))
 });
 app.post('/submit_work', function (req, res) {
-	req.body.forEach((work) => {
-		if (events[work.org_id][work.work_id] == undefined) { return }
-		response_DS(work)
-    })
+	req.body.forEach((work) => { response_DS(work) })
 	res.send("OK")
 });
 app.listen(5269, function () {
