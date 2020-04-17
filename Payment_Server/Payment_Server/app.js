@@ -22,8 +22,8 @@ function response_DS(work) {
 		if (events[work.org_id][work.work_id] != undefined) {
 			log("EXT_RESP," + JSON.stringify(work))
 			callbacks[work.org_id][work.work_id](work.msg);
-			delete events[work.org_id][work.work_id]
-			delete callbacks[work.org_id][work.work_id]
+			events[work.org_id][work.work_id] = undefined
+			callbacks[work.org_id][work.work_id] = undefined
 		}
 		res()
 	})
@@ -71,6 +71,7 @@ app.post('/submit_work', function (req, res) {
 	Promise.all(req.body.map((work) => {
 		return response_DS(work)
 	})).then(() => {
+		log("EXT_RESP_END,")
 		res.send("OK")
 	})
 });
