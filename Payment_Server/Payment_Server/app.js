@@ -34,16 +34,17 @@ function response_DS(work) {
 var work_id = 0;
 var server = net.createServer(function (socket) {
 	socket.on('data', function (data) {
-		log("DS_REQ," + data)
+		log("DS_REQ_START," + data)
 		var json = JSON.parse(data)
 		var wid = work_id++;
 		json.work_id = wid
 		events[json.org_id][wid] = json
 		callbacks[json.org_id][wid] = function (msg) {
 			msg = JSON.stringify(msg)
-			log("DS_RESP," + msg)
+			log("DS_RESP_START," + msg)
 			socket.write(msg)
 			socket.end();
+			log("DS_RESP_END," + msg)
 		}
 		setTimeout(() => {
 			response_DS({
@@ -52,6 +53,7 @@ var server = net.createServer(function (socket) {
 				msg: { error: "Timeout" }
 			})
 		}, 15000)
+		log("DS_REQ_END," + JSON.stringify(json))
 	});
 });
 server.listen(1101, '0.0.0.0');
@@ -62,7 +64,7 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.get('/show_work', function (req, res) {
-	log("EXT_REQ," + req.query)
+	log("EXT_REQ," + JSON.stringify(req.query))
 	res.send(JSON.stringify(events[req.query.org_id]))
 });
 app.post('/submit_work', function (req, res) {
