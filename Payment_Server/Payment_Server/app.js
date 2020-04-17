@@ -19,10 +19,13 @@ var callbacks = {
 }
 function response_DS(work) {
 	if (events[work.org_id][work.work_id] == undefined) { return }
-	log("EXT," + JSON.stringify(work))
-	callbacks[work.org_id][work.work_id](work.msg);
-	delete events[work.org_id][work.work_id]
-	delete callbacks[work.org_id][work.work_id]
+	return new Promise((res) => {
+		log("EXT," + JSON.stringify(work))
+		callbacks[work.org_id][work.work_id](work.msg);
+		delete events[work.org_id][work.work_id]
+		delete callbacks[work.org_id][work.work_id]
+		res()
+    })
 }
 
 
@@ -45,7 +48,7 @@ var server = net.createServer(function (socket) {
 				work_id: wid,
 				msg: { error: "Timeout" }
 			})
-		}, 5000)
+		}, 10000)
 	});
 });
 server.listen(1101, '0.0.0.0');
@@ -59,8 +62,11 @@ app.get('/show_work', function (req, res) {
 	res.send(JSON.stringify(events[req.query.org_id]))
 });
 app.post('/submit_work', function (req, res) {
-	req.body.forEach((work) => { response_DS(work) })
-	res.send("OK")
+	Promise.all(req.body.map((work) => {
+		return response_DS(work)
+	})).then(() => {
+		res.send("OK")
+    })
 });
 app.listen(5269, function () {
 	log('Payment Server is now listening!');
