@@ -52,7 +52,7 @@ var server = net.createServer(function (socket) {
 				work_id: wid,
 				msg: { error: "Timeout" }
 			})
-		}, 15000)
+		}, 30000)
 		log("DS_REQ_END," + JSON.stringify(json))
 	});
 });
