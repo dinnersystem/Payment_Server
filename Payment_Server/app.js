@@ -5,18 +5,7 @@ const fs = require('fs')
 const logger = fs.createWriteStream('log.txt', { flags: 'a' })
 const moment = require('moment')
 const config = require('./config')
-
 const https = require('https');
-/*const credentials = {
-	key: fs.readFileSync('sslcert/server.key', 'utf8'),
-	cert: readFileSync('sslcert/server.crt', 'utf8')
-};*/
-
-function log(msg) {
-	var output = moment().format("YYYY-MM-DD hh:mm:ss") + "," + msg + "\n"
-	logger.write(output);
-	console.log(output);
-}
 
 var events = config.events
 var callbacks = config.callbacks
@@ -32,7 +21,11 @@ function response_DS(work, org_id) {
 		res()
 	})
 }
-
+function log(msg) {
+	var output = moment().format("YYYY-MM-DD hh:mm:ss") + "," + msg + "\n"
+	logger.write(output);
+	console.log(output);
+}
 
 var work_id = 0;
 var server = net.createServer(function (socket) {
@@ -55,13 +48,11 @@ var server = net.createServer(function (socket) {
 				work_id: wid,
 				msg: { error: "Timeout" }
 			})
-		}, 30000)
+		}, config.network.EXT_timeout)
 		log("DS_REQ_END," + JSON.stringify(json))
 	});
 });
-server.listen(1101, '127.0.0.1');
-
-
+server.listen(config.network.DS_port, '127.0.0.1');
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -85,4 +76,11 @@ app.post('/submit_work', function (req, res) {
 		res.send("Error")
     })
 });
-app.listen(5269, function () { log('Payment Server is now listening!'); }); //https.createServer(credentials, app)
+if (config.network.https.enable) {
+	https.createServer({
+		key: fs.readFileSync(config.network.https.key, 'utf8'),
+		cert: readFileSync(config.network.https.cert, 'utf8')
+	}, app).listen(config.network.EXT_port, function () { log('Payment Server is now listening(with https)!'); });
+} else {
+	app.listen(config.network.EXT_port, function () { log('Payment Server is now listening(with http)!'); });
+}
