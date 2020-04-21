@@ -4,6 +4,13 @@ const bodyParser = require('body-parser');
 const fs = require('fs')
 const logger = fs.createWriteStream('log.txt', { flags: 'a' })
 const moment = require('moment')
+const config = require('./config')
+
+const https = require('https');
+/*const credentials = {
+	key: fs.readFileSync('sslcert/server.key', 'utf8'),
+	cert: readFileSync('sslcert/server.crt', 'utf8')
+};*/
 
 function log(msg) {
 	var output = moment().format("YYYY-MM-DD hh:mm:ss") + "," + msg + "\n"
@@ -11,24 +18,20 @@ function log(msg) {
 	console.log(output);
 }
 
-var events = {
-	"1": {}
-};
-var callbacks = {
-	"1": {}
-}
-function response_DS(work) {
+var events = config.events
+var callbacks = config.callbacks
+
+function response_DS(work, org_id) {
 	return new Promise((res) => {
-		if (events[work.org_id][work.work_id] != undefined) {
+		if (events[org_id][work.work_id] != undefined) {
 			log("EXT_RESP," + JSON.stringify(work))
-			callbacks[work.org_id][work.work_id](work.msg);
-			events[work.org_id][work.work_id] = undefined
-			callbacks[work.org_id][work.work_id] = undefined
+			callbacks[org_id][work.work_id](work.msg);
+			events[org_id][work.work_id] = undefined
+			callbacks[org_id][work.work_id] = undefined
 		}
 		res()
 	})
 }
-
 
 
 var work_id = 0;
@@ -56,23 +59,30 @@ var server = net.createServer(function (socket) {
 		log("DS_REQ_END," + JSON.stringify(json))
 	});
 });
-server.listen(1101, '0.0.0.0');
+server.listen(1101, '127.0.0.1');
 
 
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.get('/show_work', function (req, res) {
-	log("EXT_REQ," + JSON.stringify(req.query))
-	res.send(JSON.stringify(events[req.query.org_id]))
+app.post('/show_work', function (req, res) {
+	var org_id = config.auth[req.headers.authorization]
+	if (org_id == undefined) return;
+	log("EXT_REQ," + org_id)
+	res.send(JSON.stringify(events[org_id]))
 });
 app.post('/submit_work', function (req, res) {
-	Promise.all(req.body.map((work) => {
-		return response_DS(work)
+	var org_id = config.auth[req.headers.authorization]
+	if (org_id == undefined) return;
+	Promise.all(req.body.payload.map((work) => {
+		return response_DS(work, org_id)
 	})).then(() => {
 		log("EXT_RESP_END,")
 		res.send("OK")
-	})
+	}).catch((err) => {
+		log("Error," + JSON.stringify(err))
+		res.send("Error")
+    })
 });
-app.listen(5269, function () { log('Payment Server is now listening!'); });
+app.listen(5269, function () { log('Payment Server is now listening!'); }); //https.createServer(credentials, app)
