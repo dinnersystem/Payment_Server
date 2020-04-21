@@ -79,7 +79,7 @@ app.post('/submit_work', function (req, res) {
 if (config.network.https.enable) {
 	https.createServer({
 		key: fs.readFileSync(config.network.https.key, 'utf8'),
-		cert: readFileSync(config.network.https.cert, 'utf8')
+		cert: fs.readFileSync(config.network.https.cert, 'utf8')
 	}, app).listen(config.network.EXT_port, function () { log('Payment Server is now listening(with https)!'); });
 } else {
 	app.listen(config.network.EXT_port, function () { log('Payment Server is now listening(with http)!'); });
