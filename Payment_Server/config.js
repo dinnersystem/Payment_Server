@@ -10,6 +10,7 @@ module.exports = {
 	},
 	network: {
 		EXT_port: 5269,
+		EXT_timeout: 30000,
 		DS_port: 1101,
 		DS_timeout: 30000,
 		https: {
