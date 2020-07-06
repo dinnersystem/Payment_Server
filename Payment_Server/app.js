@@ -58,9 +58,6 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.post('/show_work', function (req, res) {
-	log(`i get ${req.headers.authorization}`)
-	log(`i want ${config.auth}`)
-	log(`i get orgid ${config.auth[req.headers.authorization]}`)
 	var org_id = config.auth[req.headers.authorization]
 	if (org_id == undefined) return;
 	log("EXT_REQ," + org_id)
